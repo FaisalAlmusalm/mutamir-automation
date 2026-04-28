@@ -1,0 +1,26 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+
+<suite name="MutamirApp">
+
+    <listeners>
+<listener class-name="com.mutamir.listeners.MutamirTestListener"></listener>
+    </listeners>
+
+    <test name="IosApp">
+        <parameter name="deviceName" value="iPhone 17 Pro"></parameter>
+        <parameter name="platformName" value="iOS"></parameter>
+        <parameter name="platformVersion" value="26.4"></parameter>
+
+        <classes>
+<!--            <class name="com.mutamir.testcases.MainPage"></class>-->
+<!--            <class name="com.mutamir.testcases.OmrahPath"/>-->
+<!--            <class name="com.mutamir.testcases.Settings">-->
+
+<!--            </class>-->            <class name="com.mutamir.testcases.OmrahPath"></class>
+<!--            <class name="com.mutamir.testcases.Settings"></class>-->
+
+
+        </classes>
+    </test>
+
+</suite>
