@@ -2,54 +2,64 @@ package com.mutamir.testcases;
 
 import com.mutamir.base.Base;
 import com.mutamir.screens.SettingsScreen;
-import io.appium.java_client.AppiumBy;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.List;
-
 public class Settings extends Base {
-    SettingsScreen SettingsScreen;
-    String oldLanguage;
-    @Test
-    public void testcase_01(){
-        SettingsScreen  = new SettingsScreen(driver);
-        SettingsScreen.OpenSettingsPage();
+
+    SettingsScreen settingsScreen;
+    @BeforeMethod
+    public void setUpScreen() {
+        settingsScreen = new SettingsScreen(driver);
+        settingsScreen.openSettingsPage();
+
+    }
+    @Test(priority = 1)
+    public void openSettings() {
+        String settingsTitle = settingsScreen.getSettingsPageTitle();
+        Assert.assertTrue(
+                settingsTitle.contains("Settings")
+                        || settingsTitle.contains("الإعدادات"),
+                "Settings or الاعدادت text Should appear"
+        );
+
+
     }
 
-    @Test
-    public void testcase_02() throws InterruptedException {
+    @Test(priority = 2)
+    public void changeLanguage() {
+        String oldLanguage = settingsScreen.getCurrentLanguageValue();
 
-        String oldLanguage = SettingsScreen.getCurrentLanguageValue();
+        settingsScreen.selectDifferentLanguage();
 
-        SettingsScreen.selectDifferentLanguage();
+        String newLanguage = settingsScreen.getCurrentLanguageValue();
 
-        SettingsScreen.verifyLanguageChanged(oldLanguage);
+        Assert.assertNotEquals(
+                settingsScreen.extractLanguageName(newLanguage),
+                settingsScreen.extractLanguageName(oldLanguage),
+                "Language did not change it "
+        );
+    }
+    @Test(priority = 3)
+    public void changeTheme() {
+        boolean isThemeChanged = settingsScreen.toggleTheme();
 
-        Thread.sleep(1000);
+        Assert.assertTrue(
+                isThemeChanged,
+                "Theme did not change"
+        );
     }
 
-    @Test
-    public void testcase_03() {
-
-        SettingsScreen.toggleTheme();
-    }
-
-    @Test
-    public void testcase_04() {
-
-        String deviceLanguage = SettingsScreen.getCurrentLanguageValue();
+    @Test(priority = 4)
+    public void selectCity() {
+        String deviceLanguage = settingsScreen.getCurrentLanguageValue();
 
         if (deviceLanguage.contains("العربية")) {
-            SettingsScreen.selectCity("الرياض");
+            settingsScreen.selectCity("الرياض");
         } else {
-            SettingsScreen.selectCity("Riyadh");
+            settingsScreen.selectCity("Riyadh");
         }
     }
-
-
-
 
 }

@@ -1,7 +1,22 @@
+# Maven / Java
 target/
+*.class
+out/
+
+# IntelliJ
 .idea/
 *.iml
+
+# Mac
 .DS_Store
+__MACOSX/
+
+# Logs
 *.log
+
+# Test reports
 allure-results/
 test-output/
+reports/
+screenshots/
+extent-reports/

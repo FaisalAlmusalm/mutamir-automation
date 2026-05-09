@@ -1,7 +1,9 @@
 package com.mutamir.screens;
 
 import com.mutamir.utils.ElementUtil;
+import com.mutamir.utils.ScrollUtil;
 import com.mutamir.utils.WaitUtil;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
@@ -9,177 +11,173 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 
-import static com.mutamir.base.Base.driver;
-import static com.mutamir.utils.ScrollUtil.scrollUntilFound;
+public class OmrahPathScreen {
 
-public class OmrahPathScreen  {
+    private AppiumDriver driver;
 
     public OmrahPathScreen(AppiumDriver driver) {
-
+        this.driver = driver;
         PageFactory.initElements(new AppiumFieldDecorator(driver), this);
+    }
 
+    private By startUmrahButton = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Start Umrah')]");
+    private By startOmrahCheck = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Guidelines')]");
+   // private By tawafButton = By.xpath("//*[contains(@name,'Kaaba')]");
+   private By tawafCard = AppiumBy.iOSNsPredicateString(
+           "type == 'XCUIElementTypeStaticText' AND visible == 1 AND name BEGINSWITH[c] 'Tawaf' AND name CONTAINS[c] 'Kaaba'"
+   );
+
+    private By tawafCompleted = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Completed')]");
+    private By tawafCompleted1 = AppiumBy.accessibilityId("Tawaf Completed — Alhamdulillah");
+    private By nextButton = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Next')]");
+    private By nextRoundButton = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Next Round')]");
+    private By saiiCompleted = AppiumBy.accessibilityId("Sa'i Completed — Masha'Allah");
+    private By ResetOmrahText = AppiumBy.accessibilityId("Reset Umrah Progress");
+private By resetOmrahbtn = AppiumBy.accessibilityId("Start Umrah");
+
+    @iOSXCUITFindBy(accessibility = "Sa'i →")
+    private WebElement saiiButton;
+
+
+    @iOSXCUITFindBy(accessibility = "Tahallul →")
+    private WebElement tahallulButton;
+
+    @iOSXCUITFindBy(accessibility = "Tahallul Steps")
+    private WebElement tahallulCompleted;
+
+    @iOSXCUITFindBy(accessibility = "Reset Umrah Progress")
+    private WebElement resetUmrahButton;
+
+    @iOSXCUITFindBy(iOSNsPredicate = "name == 'Reset Umrah Progress' AND label == 'Reset Umrah Progress' AND type == 'XCUIElementTypeButton'")
+    private WebElement resetUmrahConfirmButton;
+
+    @iOSXCUITFindBy(accessibility = "Return to Home")
+    private WebElement returnHomeButton;
+
+    @iOSXCUITFindBy(accessibility = "Completed")
+    private WebElement completedOmrah;
+
+    public void startOmrah() {
+        WaitUtil.waitForElement(driver, startUmrahButton);
+        ElementUtil.click(driver, startUmrahButton);
+       // WaitUtil.waitForElement(driver, resetOmrahbtn);
+      //  ElementUtil.click(driver,resetOmrahbtn);
+    }
+
+    public String getStartOmrahCheckText() {
+        WaitUtil.waitForElement(driver, startOmrahCheck);
+        return ElementUtil.getText(driver, startOmrahCheck);
     }
 
 
-    By StartOmrahBtn = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Start Umrah')]");
-//---------------------------------------
-    By StartOmrahCheck = By.xpath("d//XCUIElementTypeStaticText[contains(@name,'Guidelines')]");
-//-----------------------------------------
-By Tawaf = By.xpath("//*[contains(@name,'Kaaba')]");
-//---------------------------------------------------
-    By Tawaf_Completed =By.xpath("//XCUIElementTypeStaticText[contains(@name,'Tawaf Completed')]");
- //---------------------------------------------------------
-// By Saii = By.xpath("//XCUIElementTypeStaticText[contains(@name,\"Sa'i\")]/..");
-    @iOSXCUITFindBy(accessibility = "Sa'i →")
-    WebElement Saiibtn;
-   //--------------------------------------------------------
- //  By Saii_Completed =By.xpath("//XCUIElementTypeStaticText[contains(@name,'Completed']");
-    @iOSXCUITFindBy(accessibility = "Sa'i Completed — Masha'Allah")
-    WebElement Saii_Completed;
- //---------------------------------------------------------------------------
- // By Tahallulbtn =By.xpath("//XCUIElementTypeStaticText[contains(@name,'Tahallul]");
-    @iOSXCUITFindBy(accessibility = "Tahallul →")
-    WebElement Tahallulbtn;
+    public void openTawaf() {
+        ScrollUtil.scrollDownUntilFound(driver, tawafCard);
+        WaitUtil.waitForElement(driver, tawafCard);
 
-//-----------------------------------------------------------------------
-  // By Tahallul_Completed =By.xpath("//XCUIElementTypeStaticText[contains(@name,'Tahallul Steps']");
-    @iOSXCUITFindBy(accessibility = "Tahallul Steps")
-    WebElement Tahallul_Completed;
-  //--------------------------------------------------------------
+        for (int i = 0; i < 3; i++) {
+            try {
+                ElementUtil.tapByElementCenter(driver, tawafCard);
 
-  By resetOmrahbtn =By.xpath("//XCUIElementTypeStaticText[contains(@name,'Reset Umrah Progress']");
-    @iOSXCUITFindBy(accessibility = "Reset Umrah Progress")
-    WebElement Reset_Umrah ;
- // @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeButton[`name CONTAINS \\\"Reset\\\"`]")
-   //  WebElement confirmresetomrah;
-@iOSXCUITFindBy(iOSNsPredicate = "name == \"Reset Umrah Progress\" AND label == \"Reset Umrah Progress\" AND type == \"XCUIElementTypeButton\"")
- WebElement Reset_Umrah_confirm ;
-   // By Reset_Umrah_confirm = By.xpath("//XCUIElementTypeButton[@y='481']");
+                // If Tawaf opens, the Next button should appear
+                WaitUtil.waitForElement(driver, nextButton);
 
-    By confirmBtn = By.xpath("(//*[contains(@name,'Reset Umrah Progress')])[2]");
-   //-------------------------------------
+                return; // success, stop retrying
 
-  //  By returnhome = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Home']");
-    @iOSXCUITFindBy(accessibility = "Return to Home")
-    WebElement returnhome;
-    //------------------------------------------
+            } catch (Exception e) {
+                System.out.println("Tawaf tap failed, retry number: " + (i + 1));
 
-   // By Completed_omrah = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Completed']");
-    @iOSXCUITFindBy(accessibility = "Completed")
-    WebElement Completed_omrah;
-
-
-        public void StartOmrah(){
-            WaitUtil.waitForElement(driver, StartOmrahBtn);
-            ElementUtil.click(driver,StartOmrahBtn);
+                try {
+                    Thread.sleep(700);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
         }
 
-
-    public String CheckStartOmrah() throws InterruptedException {
-        WaitUtil.waitForElement(driver, StartOmrahCheck);
-        String text =  ElementUtil.getText(driver,StartOmrahCheck);
-        return text;
+        throw new RuntimeException("Failed to open Tawaf after 3 attempts");
     }
-
-    public void clickOpenTawaf() {
-
-        scrollUntilFound(driver, Tawaf);
-
-        driver.findElement(Tawaf).click();
-    }
-
-
-
-
-
-
 
     public String clickUntilEndTawaf() {
-        By nextBtn = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Next')]");
-        while (true) {
-            // إذا ما فيه Next → خلاص وصلنا النهاية
-            if (driver.findElements(nextBtn).isEmpty()) {
-                System.out.println("وصلت آخر صفحة ✅");
-              return   ElementUtil.getText(driver,Tawaf_Completed);
+        for (int i = 0; i < 8; i++) {
+
+            if (!driver.findElements(tawafCompleted1).isEmpty()) {
+                return ElementUtil.getText(driver, tawafCompleted1);
             }
-            driver.findElement(nextBtn).click();
+
+            if (driver.findElements(nextButton).isEmpty()) {
+                break;
+            }
+
+            ElementUtil.click(driver, nextButton);
 
             try {
-                Thread.sleep(1500);
-            } catch (Exception e) {
-                e.printStackTrace();
+                Thread.sleep(700);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
 
+        WaitUtil.waitForElement(driver, tawafCompleted1);
+        return ElementUtil.getText(driver, tawafCompleted1);
     }
 
-public void clickStartsaii_btn(){
-ElementUtil.click(driver,Saiibtn);
-}
+
+    public void openSaii() {
+        WaitUtil.waitForElement(driver, saiiButton);
+        ElementUtil.click(driver, saiiButton);
+    }
 
     public String clickUntilEndSaii() {
+        for (int i = 0; i < 8; i++) {
 
-        By nextBtn = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Next Round')]");
-
-        while (true) {
-
-            // إذا ما فيه Next → خلاص وصلنا النهاية
-            if (driver.findElements(nextBtn).isEmpty()) {
-                System.out.println("وصلت آخر صفحة ✅");
-               return ElementUtil.getText(driver,Saii_Completed);
-
+            if (!driver.findElements(saiiCompleted).isEmpty()) {
+                return ElementUtil.getText(driver, saiiCompleted);
             }
 
-            driver.findElement(nextBtn).click();
+            if (driver.findElements(nextButton).isEmpty()) {
+                break;
+            }
+
+            ElementUtil.click(driver, nextButton);
 
             try {
-                Thread.sleep(1500);
-            } catch (Exception e) {
-                e.printStackTrace();
+                Thread.sleep(700);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
-
-
         }
 
-
-
-    }
-    public void clickTahallul_btn(){
-        ElementUtil.click(driver,Tahallulbtn);
+        WaitUtil.waitForElement(driver, saiiCompleted);
+        return ElementUtil.getText(driver, saiiCompleted);
     }
 
-    public String checkcompletetahlil(){
-     return ElementUtil.getText(driver,Tahallul_Completed);
+    public void openTahallul() {
+        WaitUtil.waitForElement(driver, tahallulButton);
+        ElementUtil.click(driver, tahallulButton);
     }
 
-//    public void restomrahbtn(){
-//        WaitUtil.waitForElement(driver, resetOmrahbtn);
-//        resetOmrahbtn.click();
-//    }
-//
-//        public void confirmrestomrahbtn() {
-//            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-//            wait.until(ExpectedConditions.visibilityOfElementLocated(confirmBtn));
-//            driver.findElement(confirmBtn).click();
-//        }
-
-    public void Go_Home_Page(){
-        ElementUtil.click(driver,returnhome);
+    public String getTahallulCompletedText() {
+        WaitUtil.waitForElement(driver, tahallulCompleted);
+        return ElementUtil.getText(driver, tahallulCompleted);
     }
 
-    public void returnOmrah(){
-ElementUtil.click(driver,Reset_Umrah);
+    public void goHomePage() {
+        WaitUtil.waitForElement(driver, returnHomeButton);
+        ElementUtil.click(driver, returnHomeButton);
     }
 
-    public void confirmomrah(){
-            ElementUtil.click(driver,Reset_Umrah_confirm);
+    public void resetOmrah() {
+        WaitUtil.waitForElement(driver, resetUmrahButton);
+        ElementUtil.click(driver, resetUmrahButton);
     }
 
+    public void confirmResetOmrah() {
+        WaitUtil.waitForElement(driver, resetOmrahbtn);
+        ElementUtil.click(driver, resetOmrahbtn);
+    }
 
-
-
-      public String checkcompleteomrah(){
-        WaitUtil.waitForElement(driver, Completed_omrah);
-        return   ElementUtil.getText(driver,Completed_omrah);
+    public String getCompletedOmrahText() {
+        WaitUtil.waitForElement(driver, completedOmrah);
+        return ElementUtil.getText(driver, completedOmrah);
+    }
 }
-      }

@@ -10,99 +10,62 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.Assert;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import static com.mutamir.base.Base.driver;
-
 public class SettingsScreen {
 
+    private AppiumDriver driver;
+
     public SettingsScreen(AppiumDriver driver) {
-
+        this.driver = driver;
         PageFactory.initElements(new AppiumFieldDecorator(driver), this);
-
     }
+
+
+    private By settingsTitle = By.xpath("//XCUIElementTypeStaticText[contains(@name,'Settings') or contains(@name,'الإعدادات')]");
+    private By themeSwitch = By.xpath("(//XCUIElementTypeSwitch[@visible='true'])[1]");
+
 
     @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeWindow/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther[2]/XCUIElementTypeOther[2]/XCUIElementTypeOther[2]/XCUIElementTypeOther[1]")
-    WebElement settingsBtn;
-
-    @iOSXCUITFindBy(accessibility = "Settings")
-    WebElement settingCheck;
-    //======================================
-
-    @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeStaticText[`name == \"Language\\nEnglish\"`]")
-    WebElement lanquage_btn;
-    //   By languageOption = AppiumBy.iOSClassChain("**/XCUIElementTypeStaticText[`name == \"Language\\nEnglish\"`]");
-
-    @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeStaticText[`name == \"زبان\n" +
-            "اردو\"`]")
-    WebElement otherlanguage;
-    By languageRow = By.xpath("(//XCUIElementTypeStaticText[@name='General']/following-sibling::XCUIElementTypeStaticText)[1]");
-    By languageOptions = By.xpath("//XCUIElementTypeButton[@name!='']");
-    //======================================
-
-    //@iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[@name='الوضع الداكن']/following-sibling::XCUIElementTypeSwitch[1]")
-    // WebElement themeSwitch;
+    private WebElement settingsButton;
 
 
-    @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeSwitch[`value == \"1\"`]")
-    WebElement darkSwitch;
-
-    @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeSwitch[`value == \"0\"`][1]")
-    WebElement lightSwitch;
-
-//====================================================
-
-    @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,'Select City')]")
-    WebElement selectCity;
-
-    @iOSXCUITFindBy(accessibility = "Search city...")
-    WebElement Search_city;
-
-    @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeCell[`name CONTAINS \"Dark Mode\"`]/**/XCUIElementTypeSwitch")
-    WebElement location;
-
-    @iOSXCUITFindBy(accessibility = "24-hour")
-    WebElement TimeFormat;
-
-    @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeSwitch[`value == \"1\"`][2]")
-    WebElement Athan;
-
-
-    public void OpenSettingsPage() {
-        ElementUtil.click(driver, settingsBtn);
+    public void openSettingsPage() {
+        ElementUtil.click(driver, settingsButton);
     }
 
-    public String checkopenSettingPage() {
-        return ElementUtil.getText(driver, settingCheck);
+    public String getSettingsPageTitle() {
+        return ElementUtil.getText(driver, settingsTitle);
     }
 
     public WebElement getLanguageRowElement() {
-
         List<WebElement> texts = driver.findElements(By.xpath("//XCUIElementTypeStaticText"));
 
-        for (WebElement el : texts) {
-            if (!el.isDisplayed()) {
+        for (WebElement element : texts) {
+            if (!element.isDisplayed()) {
                 continue;
             }
 
-            Rectangle r = el.getRect();
-            String name = el.getAttribute("name");
+            Rectangle rectangle = element.getRect();
+            String name = element.getAttribute("name");
 
             if (name == null || name.isEmpty()) {
                 continue;
             }
 
-            // صف اللغة في الإعدادات يكون عنصر كبير نسبيًا
-            if (r.getX() >= 20 && r.getWidth() >= 300 && r.getHeight() >= 60 && r.getY() >= 150 && r.getY() <= 260) {
-                return el;
+            if (rectangle.getX() >= 20
+                    && rectangle.getWidth() >= 300
+                    && rectangle.getHeight() >= 60
+                    && rectangle.getY() >= 150
+                    && rectangle.getY() <= 260) {
+                return element;
             }
         }
 
-        throw new RuntimeException("ما لقيت صف اللغة");
+        throw new RuntimeException("Language row was not found");
     }
 
     public String getCurrentLanguageValue() {
@@ -113,7 +76,7 @@ public class SettingsScreen {
         getLanguageRowElement().click();
     }
 
-    private String extractLanguageName(String text) {
+    public String extractLanguageName(String text) {
         if (text == null || text.isEmpty()) {
             return "";
         }
@@ -123,16 +86,14 @@ public class SettingsScreen {
     }
 
     public void selectDifferentLanguage() {
-
         String oldLanguage = getCurrentLanguageValue().trim();
-        String currentLangName = extractLanguageName(oldLanguage);
-
-        System.out.println("اللغة الحالية: " + oldLanguage);
-        System.out.println("اسم اللغة الحالية: " + currentLangName);
+        String currentLanguageName = extractLanguageName(oldLanguage);
 
         openLanguageMenu();
 
-        List<WebElement> options = driver.findElements(By.xpath("//XCUIElementTypeButton[@name!='']"));
+        List<WebElement> options = driver.findElements(
+                By.xpath("//XCUIElementTypeButton[@name!='']")
+        );
 
         for (WebElement option : options) {
             String optionName = option.getAttribute("name");
@@ -142,66 +103,28 @@ public class SettingsScreen {
             }
 
             optionName = optionName.trim();
-            String optionLangName = extractLanguageName(optionName);
+            String optionLanguageName = extractLanguageName(optionName);
 
-            System.out.println("option = " + optionName);
-            System.out.println("optionLangName = " + optionLangName);
-
-            if (!optionLangName.equals(currentLangName)) {
+            if (!optionLanguageName.equals(currentLanguageName)) {
                 option.click();
                 return;
             }
         }
 
-        throw new RuntimeException("ما لقيت لغة مختلفة عن الحالية");
+        throw new RuntimeException("No different language option was found");
     }
-
-
-    public void verifyLanguageChanged(String oldLanguage) {
-
-        try {
-            Thread.sleep(1500);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        String newLanguage = getCurrentLanguageValue().trim();
-
-        Assert.assertNotEquals(
-                extractLanguageName(newLanguage),
-                extractLanguageName(oldLanguage),
-                "اللغة ما تغيرت"
-        );
-    }
-
-    By allSwitches = By.xpath("//XCUIElementTypeSwitch");
-
-    public WebElement getThemeSwitch() {
-        List<WebElement> switches = driver.findElements(allSwitches);
-
-        for (WebElement sw : switches) {
-            if (sw.isDisplayed()) {
-                return sw;   // أول switch ظاهر = dark mode
-            }
-        }
-
-        throw new RuntimeException("ما لقيت theme switch");
-    }
-
-    By themeSwitch = By.xpath("(//XCUIElementTypeSwitch[@visible='true'])[1]");
 
     public String getThemeValue() {
         return driver.findElement(themeSwitch).getAttribute("value");
     }
 
-    public void toggleTheme() {
+    public boolean toggleTheme() {
+        WebElement switchElement = driver.findElement(themeSwitch);
 
-        WebElement sw = driver.findElement(themeSwitch);
+        String before = switchElement.getAttribute("value");
 
-        String before = sw.getAttribute("value");
-
-        int x = sw.getRect().getX() + (sw.getRect().getWidth() / 2);
-        int y = sw.getRect().getY() + (sw.getRect().getHeight() / 2);
+        int x = switchElement.getRect().getX() + (switchElement.getRect().getWidth() / 2);
+        int y = switchElement.getRect().getY() + (switchElement.getRect().getHeight() / 2);
 
         driver.executeScript("mobile: tap", Map.of(
                 "x", x,
@@ -211,21 +134,15 @@ public class SettingsScreen {
         try {
             Thread.sleep(1500);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         String after = driver.findElement(themeSwitch).getAttribute("value");
 
-        System.out.println("before = " + before);
-        System.out.println("after = " + after);
-
-        if (before.equals(after)) {
-            throw new RuntimeException("الثيم ما تغير ❌");
-        }
+        return !before.equals(after);
     }
 
-
     public WebElement getSelectCityRow() {
-
         By cityRowLocator = By.xpath(
                 "//*[contains(@name,'Select City') " +
                         "or contains(@name,'City') " +
@@ -253,8 +170,8 @@ public class SettingsScreen {
                     .until(ExpectedConditions.elementToBeClickable(cityRowLocator));
         }
     }
-    public void selectCity(String cityName) {
 
+    public void selectCity(String cityName) {
         By searchField = By.xpath("//XCUIElementTypeTextField");
 
         if (driver.findElements(searchField).isEmpty()) {
@@ -277,15 +194,4 @@ public class SettingsScreen {
 
         city.click();
     }
-
-
-
-
-
-
-
-
-
 }
-
-

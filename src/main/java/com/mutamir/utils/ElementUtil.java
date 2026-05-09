@@ -4,6 +4,7 @@ package com.mutamir.utils;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -50,5 +51,24 @@ public class ElementUtil {
         return !driver.findElements(locator).isEmpty();
 
     }
+    public static boolean isPresent(AppiumDriver driver,WebElement e) {
+
+        return e.isDisplayed();
+
+    }
+
+    public static void tapByElementCenter(AppiumDriver driver, By locator) {
+
+        WebElement element = driver.findElement(locator);
+        Rectangle rect = element.getRect();
+
+        int x = rect.getX() + rect.getWidth() / 2;
+        int y = rect.getY() + rect.getHeight() / 2;
+        driver.executeScript("mobile: tap", java.util.Map.of(
+                "x", x,
+                "y", y
+        ));
+    }
+
 
 }
